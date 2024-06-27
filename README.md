@@ -23,7 +23,7 @@ Navigate into the repository's folder and run the command below to download the 
 pip install -r requirements.txt
 ```
 
-Then finally run the ```network.py``` file with the command below to begin training!
+Then finally run the ```network.py``` file with the command below to begin training:
 ```sh
 python3 network.py
 ```
