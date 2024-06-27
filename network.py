@@ -155,7 +155,7 @@ def main():
     predictions = model.predict(test_X)
     test_y_labels = np.argmax(test_y, axis=1)
     
-    # Calculating accuracy from predictions
+    # Calculating accuracy from predictions:
     total_predictions = len(predictions)
     correct_predictions = np.sum(predictions == test_y_labels)
     accuracy = correct_predictions / total_predictions
