@@ -2,7 +2,7 @@
 * Neural network from scratch with Forward and Backward Propagation (ReLU, Sigmoid, and Softmax support)
 * Similar parameters offered in keras like l2 lambda, decay rate, learning rate, etc.
 
-![image](https://github.com/wylieglover/NeuralNetwork-From-Scratch/assets/70774631/e8a3476c-f952-4b40-ab32-c308450fbc39)
+![image](https://github.com/wylieglover/NeuralNetwork-From-Scratch/assets/70774631/83eaaefb-d43d-4800-854b-28e80c4a9163)
 
 # Local Development Setup
 Before starting, these components must be installed:
