@@ -1,9 +1,4 @@
-import os
-import cv2
 import numpy as np
-import imgaug.augmenters as iaa
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
 
 from keras._tf_keras.keras.datasets import mnist
 from keras._tf_keras.keras.utils import to_categorical
