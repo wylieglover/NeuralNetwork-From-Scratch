@@ -88,10 +88,8 @@ class NeuralNetwork:
                 y_batch = y_train[i:i+batch_size]
                 
                 y_pred = self.forward(x_batch)
-                
                 losses.append(self.compute_loss(y_batch, y_pred))
                 accuracies.append(self.compute_accuracy(y_batch, y_pred))
-                
                 self.backward(y_batch, learning_rate, l2_lambda)
 
                 print(f"\rEpoch {epoch + 1}/{epochs}: batch {i//batch_size + 1}/{num_samples//batch_size + 1} - loss: {np.mean(losses):.4f} - accuracy: {np.mean(accuracies):.4f}", end="")
@@ -157,6 +155,7 @@ def main():
     predictions = model.predict(test_X)
     test_y_labels = np.argmax(test_y, axis=1)
     
+    # Calculating accuracy from predictions
     total_predictions = len(predictions)
     correct_predictions = np.sum(predictions == test_y_labels)
     accuracy = correct_predictions / total_predictions
