@@ -142,7 +142,7 @@ def main():
     model = NeuralNetwork(input_size=28*28)
 
     # Loading model (loading pre-trained data (model state), only use this if you have saved data):
-    # model.load_model('cat_dog_classifier', freeze_layers=False, exclude_final_layer=False)
+    # model.load_model('mnist_classifier', freeze_layers=False, exclude_final_layer=False)
 
     # Setting up layers:
     model.add_layer(units=512, activation='relu', trainable=True)
@@ -151,7 +151,7 @@ def main():
     
     # Training and saving model:
     model.train(train_X, train_y, epochs=1, initial_learning_rate=0.001, decay_rate=0.01, batch_size=32, l2_lambda=0.001)
-    model.save_model('cat_dog_classifier')
+    model.save_model('mnist_classifier')
     
     # Example of using model to predict:
     predictions = model.predict(test_X)
