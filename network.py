@@ -117,14 +117,11 @@ class NeuralNetwork:
     def compute_accuracy(self, y_true, y_pred):
         if self.activations[-1] == 'sigmoid':
             predictions = (y_pred >= 0.5).astype(int)
-            if y_true.any() == None:
-                return predictions
             accuracy = np.mean(predictions == y_true)
         elif self.activations[-1] == 'softmax':
             predictions = np.argmax(y_pred, axis=1)
-            if y_true.any() == None:
-                return predictions
-            accuracy = np.mean(predictions == y_true)
+            true_labels = np.argmax(y_true, axis=1)
+            accuracy = np.mean(predictions == true_labels)
         else:
             raise ValueError(f"Unsupported activation function: {self.activations[-1]}")
         return accuracy
@@ -138,60 +135,16 @@ class NeuralNetwork:
         else:
             raise ValueError(f"Unsupported activation function: {self.activations[-1]}")
 
-def create_data(path):
-    augmenter = iaa.Sequential([
-        iaa.Fliplr(0.5),  # horizontal flips
-        iaa.Affine(rotate=(-20, 20)),  # random rotations
-        iaa.Affine(translate_percent={"x": (-0.1, 0.1), "y": (-0.1, 0.1)}),  # random translations
-        iaa.Affine(scale=(0.8, 1.2)),  # random scaling
-        iaa.AdditiveGaussianNoise(scale=0.05*255),  # random noise
-        iaa.Multiply((0.8, 1.2))  # random brightness
-    ])
-
-    X = []
-    y = []
-    convert = lambda category : int(category == 'dog')
-    for p in os.listdir(path):
-        category = ''
-        category = (p.split("."))[0]
-        category = convert(category)
-
-        img_array = cv2.imread(os.path.join(path, p), cv2.IMREAD_GRAYSCALE) # Greyscale
-        new_img_array = cv2.resize(img_array, dsize=(80, 80))  # Resize 
-        new_img_array = augmenter(image=new_img_array)
-
-        X.append(new_img_array)
-        y.append(category)
-    
-    return np.array(X).reshape(-1, 80 * 80) / 255.0, np.array(y).reshape(-1, 1)
-
-def load_data_without_labels(path):
-    X = []
-    file_names = []
-    for p in os.listdir(path):
-        img_array = cv2.imread(os.path.join(path, p), cv2.IMREAD_GRAYSCALE) # Greyscale
-        new_img_array = cv2.resize(img_array, dsize=(80, 80))  # Resize 
-        X.append(new_img_array)
-        file_names.append(p)
-    return np.array(X).reshape(-1, 80 * 80) / 255.0, file_names
-
 def main():
-    # Training and test paths:
-    train_path = 'input/train'
-    test_path = 'input/test1'
-    
-    # Cat/Dog data and formatting:
-    X, y = create_data(train_path)
-    
-    # Mnist data and formatting (optional example data):
-    # (train_X, train_y), (test_X, test_y) = mnist.load_data()
-    # train_X = train_X.reshape(-1, 784) / 255.0
-    # test_X = test_X.reshape(-1, 784) / 255.0
-    # train_y = to_categorical(train_y, 10)
-    # test_y = to_categorical(test_y, 10)
+    # Mnist data and formatting (example data):
+    (train_X, train_y), (test_X, test_y) = mnist.load_data()
+    train_X = train_X.reshape(-1, 784) / 255.0
+    test_X = test_X.reshape(-1, 784) / 255.0
+    train_y = to_categorical(train_y, 10)
+    test_y = to_categorical(test_y, 10)
     
     # Initializing model:
-    model = NeuralNetwork(input_size=80*80)
+    model = NeuralNetwork(input_size=28*28)
 
     # Loading model (loading pre-trained data (model state), only use this if you have saved data):
     # model.load_model('cat_dog_classifier', freeze_layers=False, exclude_final_layer=False)
@@ -199,31 +152,21 @@ def main():
     # Setting up layers:
     model.add_layer(units=512, activation='relu', trainable=True)
     model.add_layer(units=512, activation='relu', trainable=True)
-    model.add_layer(units=512, activation='relu', trainable=True)
-    model.add_layer(units=1, activation='sigmoid', trainable=True)
+    model.add_layer(units=10, activation='softmax', trainable=True)
     
     # Training and saving model:
-    model.train(X, y, epochs=50, initial_learning_rate=0.001, decay_rate=0.01, batch_size=32, l2_lambda=0.001)
+    model.train(train_X, train_y, epochs=1, initial_learning_rate=0.001, decay_rate=0.01, batch_size=32, l2_lambda=0.001)
     model.save_model('cat_dog_classifier')
     
-    # Example of using model to predict without y_test (y_true):
-    X_new, file_names = load_data_without_labels(test_path)
-    predictions = model.predict(X_new)
-
-    def plot_image_with_label(file_name, label):
-        img = mpimg.imread(file_name)
-        plt.imshow(img)
-        plt.axis('off') 
-        plt.title(label, fontsize=12)
-        plt.show()
-
-    i = 0
-    for prediction, file in zip(predictions, file_names):
-        i += 1
-        if "sol" not in file and i < 5:
-            label = "dog" if prediction == 1 else "cat"
-            plot_image_with_label('input/test1/' + file, label)
-
+    # Example of using model to predict:
+    predictions = model.predict(test_X)
+    test_y_labels = np.argmax(test_y, axis=1)
+    
+    total_predictions = len(predictions)
+    correct_predictions = np.sum(predictions == test_y_labels)
+    accuracy = correct_predictions / total_predictions
+    print(f"Accuracy: {accuracy:.4f}")
+            
 if __name__ == "__main__":
     main()
     
